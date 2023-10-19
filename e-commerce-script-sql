@@ -1,0 +1,150 @@
+-- Cria o banco de dados se não existir
+CREATE DATABASE IF NOT EXISTS ecommerce_db CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+USE ecommerce_db;
+
+CREATE TABLE IF NOT EXISTS Vendedor_Terceiro (
+  Vendedor_TerceiroID INT NOT NULL AUTO_INCREMENT,
+  Razao_Social VARCHAR(45) NULL,
+  Local VARCHAR(45) NULL,
+  PRIMARY KEY (Vendedor_TerceiroID)
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS Produto (
+  ProdutoID INT NOT NULL AUTO_INCREMENT,
+  Categoria VARCHAR(45) NULL,
+  Descricao VARCHAR(45) NULL,
+  Valor DECIMAL(10, 2) NULL,
+  PRIMARY KEY (ProdutoID)
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS Produto_por_Vendedor (
+  Produto_por_VendedorID INT NOT NULL AUTO_INCREMENT,
+  Vendedor_TerceiroID INT NOT NULL,
+  ProdutoID INT NOT NULL,
+  Quantidade INT NULL,
+  PRIMARY KEY (Produto_por_VendedorID),
+  FOREIGN KEY (Vendedor_TerceiroID) REFERENCES Vendedor_Terceiro (Vendedor_TerceiroID),
+  FOREIGN KEY (ProdutoID) REFERENCES Produto (ProdutoID)
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS Fornecedor (
+  FornecedorID INT NOT NULL AUTO_INCREMENT,
+  Razao_Social VARCHAR(45) NULL,
+  CNPJ VARCHAR(45) NULL,
+  PRIMARY KEY (FornecedorID)
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS Disponibiliza_Produto (
+  ProdutoID INT NOT NULL,
+  FornecedorID INT NOT NULL,
+  PRIMARY KEY (ProdutoID, FornecedorID),
+  FOREIGN KEY (ProdutoID) REFERENCES Produto (ProdutoID),
+  FOREIGN KEY (FornecedorID) REFERENCES Fornecedor (FornecedorID)
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS Estoque (
+  EstoqueID INT NOT NULL AUTO_INCREMENT,
+  Local VARCHAR(45) NULL,
+  PRIMARY KEY (EstoqueID)
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS Relacao_Produto_Estoque (
+  ProdutoID INT NOT NULL,
+  EstoqueID INT NOT NULL,
+  Quantidade INT NULL,
+  PRIMARY KEY (ProdutoID, EstoqueID),
+  FOREIGN KEY (ProdutoID) REFERENCES Produto (ProdutoID),
+  FOREIGN KEY (EstoqueID) REFERENCES Estoque (EstoqueID)
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS PJ (
+  PJID INT NOT NULL AUTO_INCREMENT,
+  Nome VARCHAR(45) NOT NULL,
+  CNPJ VARCHAR(45) NOT NULL,
+  Contato VARCHAR(45) NOT NULL,
+  Endereco VARCHAR(150) NOT NULL,
+  PRIMARY KEY (PJID),
+  UNIQUE INDEX CNPJ_UNIQUE (CNPJ ASC)
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS PF (
+  PFID INT NOT NULL AUTO_INCREMENT,
+  Nome VARCHAR(45) NOT NULL,
+  CPF VARCHAR(45) NOT NULL,
+  Contato VARCHAR(45) NOT NULL,
+  Endereco VARCHAR(150) NOT NULL,
+  PRIMARY KEY (PFID),
+  UNIQUE INDEX CPF_UNIQUE (CPF ASC)
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS Debito_Online (
+  DebitoOnlineID INT NOT NULL AUTO_INCREMENT,
+  TitularConta VARCHAR(50) NULL,
+  Banco VARCHAR(45) NULL,
+  Agencia VARCHAR(45) NULL,
+  Conta VARCHAR(45) NULL,
+  PRIMARY KEY (DebitoOnlineID)
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS Credito (
+  CreditoID INT NOT NULL AUTO_INCREMENT,
+  Titular_Cartao VARCHAR(45) NULL,
+  Numero_Cartao VARCHAR(45) NULL,
+  Vencimento_Cartao VARCHAR(45) NULL,
+  Codigo_CVV VARCHAR(45) NULL,
+  PRIMARY KEY (CreditoID)
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS Boleto (
+   BoletoID INT NOT NULL AUTO_INCREMENT,
+  Codigo_Barras VARCHAR(45) NULL,
+  PRIMARY KEY (BoletoID)
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS Pagamento (
+  PagamentoID INT NOT NULL AUTO_INCREMENT,
+  StatusPagamento VARCHAR(45) NULL,
+  DebitoOnlineID INT NOT NULL,
+  BoletoID INT NOT NULL,
+  CreditoID INT NOT NULL,
+  PRIMARY KEY (PagamentoID),
+  FOREIGN KEY (DebitoOnlineID) REFERENCES Debito_Online (DebitoOnlineID),
+  FOREIGN KEY (BoletoID) REFERENCES Boleto (BoletoID),
+  FOREIGN KEY (CreditoID) REFERENCES Credito (CreditoID)
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS Cliente (
+  ClienteID INT NOT NULL AUTO_INCREMENT,
+  PJID INT NOT NULL,
+  PFID INT NOT NULL,
+  ClientePagamentoID INT NOT NULL,
+  PRIMARY KEY (ClienteID),
+  FOREIGN KEY (PJID) REFERENCES PJ (PJID),
+  FOREIGN KEY (PFID) REFERENCES PF (PFID),
+  FOREIGN KEY (ClientePagamentoID) REFERENCES Pagamento (PagamentoID)
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS Pedido (
+  PedidoID INT NOT NULL AUTO_INCREMENT,
+  StatusPedido VARCHAR(45) NULL,
+  Descricao VARCHAR(45) NULL,
+  ClienteID INT NOT NULL,
+  Frete DECIMAL(10, 2) NULL,
+  EnderecoEntrega VARCHAR(150) NULL,
+  CodigoRastreio VARCHAR(45) NULL,
+  PRIMARY KEY (PedidoID),
+  FOREIGN KEY (ClienteID) REFERENCES Cliente (ClienteID)
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS Relacao_Produto_Pedido (
+  ProdutoID INT NOT NULL,
+  PedidoID INT NOT NULL,
+  Quantidade INT NULL,
+  FOREIGN KEY (ProdutoID) REFERENCES Produto (ProdutoID),
+  FOREIGN KEY (PedidoID) REFERENCES Pedido (PedidoID)
+) ENGINE = InnoDB;
+
+
+
+
