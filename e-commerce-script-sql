@@ -97,7 +97,7 @@ CREATE TABLE IF NOT EXISTS Credito (
 ) ENGINE = InnoDB;
 
 CREATE TABLE IF NOT EXISTS Boleto (
-   BoletoID INT NOT NULL AUTO_INCREMENT,
+  BoletoID INT NOT NULL AUTO_INCREMENT,
   Codigo_Barras VARCHAR(45) NULL,
   PRIMARY KEY (BoletoID)
 ) ENGINE = InnoDB;
@@ -144,7 +144,3 @@ CREATE TABLE IF NOT EXISTS Relacao_Produto_Pedido (
   FOREIGN KEY (ProdutoID) REFERENCES Produto (ProdutoID),
   FOREIGN KEY (PedidoID) REFERENCES Pedido (PedidoID)
 ) ENGINE = InnoDB;
-
-
-
-
